@@ -42,26 +42,26 @@ npm start
 ## 📁Project Structure
 
 File Folder	    Purpose
-index.html	    Main interface: swipe, chat, map
-main.js	        Logic for Electron app and interaction
-package.json	  Project config: dependencies & entry file
+index.html	    Main interface: swipe, chat, map  
+main.js	        Logic for Electron app and interaction  
+package.json	  Project config: dependencies & entry file  
 
 ## 🧑‍💻How to Edit
 
-Open the project folder using Visual Studio Code
-Modify index.html for layout and UI
-Modify main.js for logic and behavior
+Open the project folder using Visual Studio Code  
+Modify index.html for layout and UI  
+Modify main.js for logic and behavior  
 
 ## ✨Features
 
-Match users with swipe cards (left/right)
-Auto-reply bots with chat bubbles
-User avatars on a map with tags
-Modern, app-like theme and animations
+Match users with swipe cards (left/right)  
+Auto-reply bots with chat bubbles  
+User avatars on a map with tags  
+Modern, app-like theme and animations  
 
 ## 🙋‍♂️ Maintainer
-Tianze Chen
-GitHub: @Tianze-Chen819
+Tianze Chen  
+GitHub: @Tianze-Chen819  
 
 ## 👥 Collaborators
 
@@ -71,9 +71,9 @@ GitHub: @Tianze-Chen819
 
 
 ## ✅ How to Commit and Push Changes (Step-by-step)
-After editing code:
-1. Save your changes in VS Code
-2. In Terminal, make sure you're in the project folder:
+After editing code:  
+1. Save your changes in VS Code  
+2. In Terminal, make sure you're in the project folder:  
 ```bash
 cd ~/Desktop/LGBTQ-Social-Platform
 ```
@@ -95,6 +95,6 @@ git push
 ```
 
 ## 💡 Tips for Collaborating
-Always run git pull before starting work each day
-Write short, clear commit messages
-Ask if unsure before deleting or renaming files
+Always run git pull before starting work each day  
+Write short, clear commit messages  
+Ask if unsure before deleting or renaming files  
