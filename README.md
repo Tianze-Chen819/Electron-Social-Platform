@@ -45,7 +45,6 @@ File Folder	    Purpose
 index.html	    Main interface: swipe, chat, map
 main.js	        Logic for Electron app and interaction
 package.json	  Project config: dependencies & entry file
-node_modules/	  Installed packages (auto-created by npm)
 
 ## 🧑‍💻How to Edit
 
@@ -63,3 +62,39 @@ Modern, app-like theme and animations
 ## 🙋‍♂️ Maintainer
 Tianze Chen
 GitHub: @Tianze-Chen819
+
+## 👥 Collaborators
+
+- Tianze Chen  
+- Haojing Gao  
+- Yuan Tao  
+
+
+## ✅ How to Commit and Push Changes (Step-by-step)
+After editing code:
+1. Save your changes in VS Code
+2. In Terminal, make sure you're in the project folder:
+```bash
+cd ~/Desktop/LGBTQ-Social-Platform
+```
+3. Stage all your changes:
+```bash
+git add --all
+```
+4. Commit your changes:
+```bash
+git commit -m "Describe what you changed"
+```
+Example:
+```bash
+git commit -m "Fix layout of match cards"
+```
+5. Push to GitHub:
+```bash
+git push
+```
+
+## 💡 Tips for Collaborating
+Always run git pull before starting work each day
+Write short, clear commit messages
+Ask if unsure before deleting or renaming files
