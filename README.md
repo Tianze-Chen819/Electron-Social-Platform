@@ -34,7 +34,7 @@ npm install
 ### 4. Run the App
 
 ```bash
-npm start
+npx electron .
 ```
 
 
