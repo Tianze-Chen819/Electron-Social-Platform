@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>LGBTQ Chat App</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f1f2f6;
+      color: #333;
+    }
+    .page { display: none; }
+    .active { display: block; }
+    .contact-list {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+      padding: 20px;
+    }
+    .contact { text-align: center; cursor: pointer; }
+    .contact img {
+      border-radius: 50%; width: 90px; height: 90px;
+      border: 3px solid #ddd; transition: transform 0.3s ease;
+    }
+    .contact img:hover {
+      transform: scale(1.08); border-color: #ffa8e2;
+    }
+    .card {
+      background: white; width: 340px; margin: 30px auto;
+      padding: 24px; border-radius: 18px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+    }
+    .avatar {
+      width: 100px; height: 100px;
+      border-radius: 50%; margin: 0 auto;
+      background-size: cover; background-position: center;
+      border: 4px solid #ffb3ec;
+    }
+    .name { text-align: center; font-size: 22px; font-weight: 600; margin-top: 12px; color: #2f3542; }
+    .chatbox { margin-top: 30px; padding-top: 10px; border-top: 1px solid #eee; }
+    .messages {
+      display: flex; flex-direction: column;
+      height: 150px; overflow-y: auto;
+      background: #fefefe; padding: 12px; margin-bottom: 10px;
+      border-radius: 10px; border: 1px solid #e0e0e0;
+      font-size: 14px; line-height: 1.5;
+    }
+    .bubble {
+      max-width: 70%; padding: 8px 12px;
+      margin: 6px 0; border-radius: 16px;
+      display: inline-block; line-height: 1.4;
+    }
+    .me {
+      background: #d1ffe3; align-self: flex-end;
+      text-align: right; border-top-right-radius: 0;
+      margin-left: auto;
+    }
+    .them {
+      background: #f0f0f0; border-top-left-radius: 0; text-align: left;
+    }
+    .input-row { display: flex; gap: 10px; }
+    .input-row input {
+      flex: 1; padding: 10px;
+      border-radius: 8px; border: 1px solid #ccc;
+      outline: none;
+    }
+    .input-row button {
+      padding: 10px 14px; border: none;
+      background: linear-gradient(to right, #ff7eb3, #ff758c);
+      color: white; border-radius: 8px; cursor: pointer;
+    }
+    button { padding: 10px 16px; font-size: 14px;
+      background: linear-gradient(to right, #7f00ff, #e100ff);
+      color: white; border: none; border-radius: 12px; cursor: pointer;
+    }
+    button:hover { opacity: 0.9; }
+    .back-btn {
+      margin: 20px auto 0; display: block;
+      background: #ccc; color: black;
+      border-radius: 10px;
+    }
+    .swipe-card {
+      position: relative; width: 300px; height: 350px;
+      margin: 40px auto; border-radius: 16px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+      overflow: hidden; transition: transform 0.4s ease, opacity 0.4s ease;
+    }
+    .swipe-card.swipe-left {
+      transform: translateX(-400px) rotate(-15deg); opacity: 0;
+    }
+    .swipe-card.swipe-right {
+      transform: translateX(400px) rotate(15deg); opacity: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="page active" id="homePage">
+    <h2 style="text-align:center; padding-top: 20px;">People Nearby</h2>
+    <div style="text-align:center; margin-bottom: 10px;">
+      <button onclick="openMatchPage()">Start Matching 💘</button>
+      <button onclick="showMapPage()">📍 View Map</button>
+    </div>
+    <div class="contact-list" id="contactList"></div>
+  </div>
+
+  <div class="page" id="chatPage">
+    <button class="back-btn" onclick="goHome()">← Back</button>
+    <div class="card" id="userCard">
+      <div class="avatar" id="avatar"></div>
+      <div class="name" id="userName">Loading...</div>
+      <div class="chatbox">
+        <div class="messages" id="messages"></div>
+        <div class="input-row">
+          <input type="text" id="input" placeholder="Type a message..." />
+          <button onclick="sendMessage()">Send</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page" id="matchPage">
+    <div class="swipe-card card" id="matchCard">
+      <div class="avatar" id="matchAvatar"></div>
+      <div class="name" id="matchName">Someone special...</div>
+      <div style="text-align:center; margin-top: 20px;">
+        <button onclick="swipe('left')">❌</button>
+        <button onclick="swipe('right')">❤️</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="page" id="mapPage">
+    <button onclick="goHome()" class="back-btn">← Back</button>
+    <div id="map" style="height: 600px;"></div>
+  </div>
+
+<script>
+  const users = [
+    { name: "Leo", age: 26, avatar: "https://i.pravatar.cc/101?img=1", messages: [] },
+    { name: "Alex", age: 29, avatar: "https://i.pravatar.cc/101?img=2", messages: [] },
+    { name: "Ryan", age: 24, avatar: "https://i.pravatar.cc/101?img=3", messages: [] }
+  ];
+
+  const mapUsers = [
+    { name: "Leo", avatar: "https://i.pravatar.cc/101?img=1", lat: 39.9042, lon: 116.4074, tags: ["🎮", "📷", "🌈"] },
+    { name: "Alex", avatar: "https://i.pravatar.cc/101?img=2", lat: 31.2304, lon: 121.4737, tags: ["🎵", "💪", "🍿"] },
+    { name: "Ryan", avatar: "https://i.pravatar.cc/101?img=3", lat: 23.1291, lon: 113.2644, tags: ["✈️", "🐶", "📖"] }
+  ];
+
+  let currentUser = 0;
+  let matchQueue = [...users];
+  let currentMatch = 0;
+
+  function showPage(id) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+
+  function renderContacts() {
+    const list = document.getElementById('contactList');
+    list.innerHTML = '';
+    users.forEach((user, index) => {
+      const div = document.createElement('div');
+      div.className = 'contact';
+      div.innerHTML = `<img src="${user.avatar}" onclick="openChat(${index})" /><div>${user.name}</div>`;
+      list.appendChild(div);
+    });
+  }
+
+  function openChat(index) {
+    currentUser = index;
+    updateCard();
+    showPage('chatPage');
+  }
+
+  function updateCard() {
+    const user = users[currentUser];
+    document.getElementById("avatar").style.backgroundImage = `url('${user.avatar}')`;
+    document.getElementById("userName").innerText = `${user.name}, ${user.age}`;
+    const messagesEl = document.getElementById("messages");
+    messagesEl.innerHTML = user.messages.map(m => {
+      const isMe = m.startsWith("You:");
+      return `<div class='bubble ${isMe ? "me" : "them"}'>${m}</div>`;
+    }).join("");
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+    document.getElementById("input").value = "";
+  }
+
+  function sendMessage() {
+    const input = document.getElementById("input");
+    const text = input.value.trim();
+    if (text) {
+      const user = users[currentUser];
+      user.messages.push(`You: ${text}`);
+      updateCard();
+      input.value = "";
+      setTimeout(() => {
+        let reply = text.includes("hi") ? "Hey there!" : `Interesting... "${text.slice(0, 20)}..."`;
+        user.messages.push(`${user.name}: ${reply}`);
+        updateCard();
+      }, 800);
+    }
+  }
+
+  function goHome() {
+    showPage('homePage');
+  }
+
+  function openMatchPage() {
+    currentMatch = 0;
+    if (matchQueue.length > 0) {
+      showMatch(currentMatch);
+      showPage('matchPage');
+    } else {
+      alert("No more matches!");
+    }
+  }
+
+  function showMatch(index) {
+    const user = matchQueue[index];
+    document.getElementById("matchAvatar").style.backgroundImage = `url('${user.avatar}')`;
+    document.getElementById("matchName").innerText = `${user.name}, ${user.age}`;
+  }
+
+  function rejectMatch() {
+    currentMatch++;
+    if (currentMatch >= matchQueue.length) {
+      alert("No more matches!");
+      goHome();
+    } else {
+      showMatch(currentMatch);
+    }
+  }
+
+  function acceptMatch() {
+    const matchedUser = matchQueue[currentMatch];
+    alert(`🎉 It's a match with ${matchedUser.name}!`);
+    openChatByName(matchedUser.name);
+  }
+
+  function swipe(direction) {
+    const card = document.getElementById("matchCard");
+    card.classList.add(direction === 'left' ? 'swipe-left' : 'swipe-right');
+    setTimeout(() => {
+      card.classList.remove("swipe-left", "swipe-right");
+      direction === 'right' ? acceptMatch() : rejectMatch();
+    }, 400);
+  }
+
+  function openChatByName(name) {
+    const index = users.findIndex(u => u.name === name);
+    if (index !== -1) openChat(index);
+  }
+
+  function showMapPage() {
+    showPage('mapPage');
+    const map = L.map('map').setView([35.8617, 104.1954], 4);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    mapUsers.forEach(user => {
+      const icon = L.divIcon({
+        html: `<img src="${user.avatar}" style="width:40px; height:40px; border-radius:50%; border:2px solid #ff66c4;">`,
+        iconSize: [40, 40], className: 'map-avatar'
+      });
+      const popup = `<b>${user.name}</b><br>${user.tags.join(' ')}`;
+      L.marker([user.lat, user.lon], { icon }).addTo(map).bindPopup(popup);
+    });
+  }
+
+  renderContacts();
+</script>
+</body>
+</html>
