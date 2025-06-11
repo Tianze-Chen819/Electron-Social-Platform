@@ -34,7 +34,7 @@ npm install
 ### 4. Run the App
 
 ```bash
-npx electron .
+npm start
 ```
 
 
@@ -72,8 +72,10 @@ GitHub: @Tianze-Chen819
 
 ## ✅ How to Commit and Push Changes (Step-by-step)
 After editing code:  
-1. Save your changes in VS Code  
-2. In Terminal, make sure you're in the project folder:  
+1. Save your changes in VS Code
+ ❕❕❕每次上传时不要上传node_modules文件夹，这个文件夹是运行软件的dependencies超出100MB
+      可以直接删掉这个文件夹再进行下面操作（下一次打开时npm install的时候会再此下回来）。    
+3. In Terminal, make sure you're in the project folder:  
 ```bash
 cd ~/Desktop/LGBTQ-Social-Platform
 ```
@@ -93,6 +95,19 @@ git commit -m "Fix layout of match cards"
 ```bash
 git push
 ```
+
+6. ✅(不推荐的做法，会删掉原本的branch最好在进行操作前通知别的collaborators) 如果不小心node_modules被commit然后在push的时候卡住可以进行一下操作
+   （1）control + C 终止push
+   （2）在文件夹中删掉node_modules
+   （3）运行以下代码
+   ``` bash
+   git checkout --orphan latest-clean
+   git add -A
+   git commit -m "Clean history"
+   git branch -D main
+   git branch -m main
+   git push -f origin main
+   ```
 
 ## 💡 Tips for Collaborating
 Always run git pull before starting work each day  
