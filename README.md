@@ -1,4 +1,4 @@
-# LGBTQ Social Platform
+# Electron Social Platform
 
 A prototype desktop app built with Electron to connect users through matching, chatting, and location-based discovery.
 
